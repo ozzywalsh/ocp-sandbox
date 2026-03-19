@@ -2,11 +2,11 @@ apiVersion: opentelemetry.io/v1beta1
 kind: OpenTelemetryCollector
 metadata:
   name: otel
-  namespace: sandbox 
+  namespace: sandbox
 spec:
   mode: deployment # deployment, daemonset, statefulset, sidecar
   config:
-    receivers: 
+    receivers:
       otlp:
         protocols:
           grpc: {}
@@ -18,17 +18,17 @@ spec:
           thrift_compact: {}
           thrift_http: {}
       zipkin: {}
-    processors: 
+    processors:
       batch: {}
       memory_limiter:
         check_interval: 1s
         limit_percentage: 50
         spike_limit_percentage: 30
-    exporters: 
+    exporters:
       debug: {}
     service:
       pipelines:
         traces:
-          receivers: [otlp,jaeger,zipkin]
-          processors: [memory_limiter,batch]
+          receivers: [otlp, jaeger, zipkin]
+          processors: [memory_limiter, batch]
           exporters: [debug]

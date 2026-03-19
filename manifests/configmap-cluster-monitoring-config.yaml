@@ -5,3 +5,4 @@ metadata:
   namespace: openshift-monitoring
 data:
   config.yaml: |
+    enableUserWorkload: true
