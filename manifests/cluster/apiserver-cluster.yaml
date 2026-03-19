@@ -5,3 +5,4 @@ metadata:
 spec:
   tlsSecurityProfile:
     type: Intermediate
+    intermediate: {}
