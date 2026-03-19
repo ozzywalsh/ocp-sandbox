@@ -1,22 +1,20 @@
 # OpenTelemetry Sandbox
 
-OpenShift cluster configuration for deploying the OpenTelemetry operator and a collector instance.
+OpenShift (CRC) cluster configuration for deploying the OpenTelemetry operator, a collector instance, and monitoring infrastructure.
 
 ## Structure
 
 ```
 manifests/
-  cluster/          # Cluster-scoped resources: namespaces, RBAC, API server config
+  cluster/          # Cluster-scoped resources: namespaces, RBAC, API server config, alertmanager
   operator/         # OLM resources for installing the OpenTelemetry operator
-  workloads/        # Application resources: collectors, deployments, services
+  workloads/        # Application resources: collectors, monitoring config, mailpit
 ```
 
 ## Apply Order
 
-Resources must be applied in stages since the operator needs to be running before its CRDs can be used.
-
 ```bash
-# 1. Cluster-scoped resources (namespaces, RBAC, cluster config)
+# 1. Cluster-scoped resources (namespaces, RBAC, cluster config, alertmanager)
 kubectl apply -f manifests/cluster/
 
 # 2. Install the OpenTelemetry operator
@@ -28,4 +26,15 @@ kubectl wait --for=condition=Available deployment/opentelemetry-operator-control
 
 # 4. Deploy workloads
 kubectl apply -f manifests/workloads/
+```
+
+## MailPit
+
+MailPit runs in the `sandbox` namespace as a local SMTP server for Alertmanager notifications. Alertmanager is configured to send all alerts (except Watchdog) to MailPit.
+
+Access the web UI via the OpenShift route:
+
+```bash
+oc get route mailpit -n sandbox
+# opens at http://mailpit-sandbox.apps-crc.testing
 ```
