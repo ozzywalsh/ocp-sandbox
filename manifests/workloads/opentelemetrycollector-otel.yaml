@@ -25,7 +25,8 @@ spec:
         limit_percentage: 50
         spike_limit_percentage: 30
     exporters:
-      debug: {}
+      debug:
+        verbosity: detailed
     service:
       pipelines:
         traces:
