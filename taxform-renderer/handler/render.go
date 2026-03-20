@@ -13,9 +13,14 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/metric"
 )
 
 var tracer = otel.Tracer("taxform-renderer/handler")
+var meter = otel.Meter("taxform-renderer/handler")
+var renderCount, _ = meter.Int64Counter("render.count",
+	metric.WithDescription("Total number of tax form renders"),
+)
 
 type RenderRequest struct {
 	Template          string            `json:"template"`
@@ -32,6 +37,9 @@ func Render() http.Handler {
 		var req RenderRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			span.SetStatus(codes.Error, "invalid request body")
+			renderCount.Add(ctx, 1,
+				metric.WithAttributes(attribute.String("status", "error"), attribute.String("template", "")),
+			)
 			http.Error(w, "invalid request body", http.StatusBadRequest)
 			return
 		}
@@ -50,10 +58,16 @@ func Render() http.Handler {
 		pdf, err := fillPDF(ctx, templatePath, req)
 		if err != nil {
 			span.SetStatus(codes.Error, err.Error())
+			renderCount.Add(ctx, 1,
+				metric.WithAttributes(attribute.String("status", "error"), attribute.String("template", req.Template)),
+			)
 			http.Error(w, fmt.Sprintf("failed to render pdf: %v", err), http.StatusInternalServerError)
 			return
 		}
 
+		renderCount.Add(ctx, 1,
+			metric.WithAttributes(attribute.String("status", "success"), attribute.String("template", req.Template)),
+		)
 		w.Header().Set("Content-Type", "application/pdf")
 		w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s-filled.pdf", req.Template))
 		w.Write(pdf)

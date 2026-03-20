@@ -1,0 +1,14 @@
+FROM registry.access.redhat.com/ubi9/go-toolset:9.7 AS builder
+
+WORKDIR /opt/app-root/src
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 go build -o /opt/app-root/taxform-renderer .
+
+FROM registry.access.redhat.com/ubi9/ubi-micro
+
+COPY --from=builder /opt/app-root/taxform-renderer /taxform-renderer
+
+EXPOSE 8080
+ENTRYPOINT ["/taxform-renderer"]

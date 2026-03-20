@@ -5,8 +5,10 @@ import (
 	"os"
 
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
+	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
@@ -40,8 +42,27 @@ func Setup(ctx context.Context) (func(context.Context) error, error) {
 		trace.WithResource(res),
 	)
 
+	metricExporter, err := otlpmetricgrpc.New(ctx,
+		otlpmetricgrpc.WithEndpoint(endpoint),
+		otlpmetricgrpc.WithInsecure(),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	mp := sdkmetric.NewMeterProvider(
+		sdkmetric.WithReader(sdkmetric.NewPeriodicReader(metricExporter)),
+		sdkmetric.WithResource(res),
+	)
+
 	otel.SetTracerProvider(tp)
+	otel.SetMeterProvider(mp)
 	otel.SetTextMapPropagator(propagation.TraceContext{})
 
-	return tp.Shutdown, nil
+	return func(ctx context.Context) error {
+		if err := tp.Shutdown(ctx); err != nil {
+			return err
+		}
+		return mp.Shutdown(ctx)
+	}, nil
 }

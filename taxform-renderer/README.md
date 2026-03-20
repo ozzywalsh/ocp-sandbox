@@ -11,12 +11,12 @@ go run .
 ### Fill a form
 
 ```bash
-curl -X POST http://localhost:8080/render \
+curl -X POST http://taxform-renderer-sandbox.apps-crc.testing/render \
   -H 'Content-Type: application/json' \
   -d '{
-    "template": "default",
+    "template": "foo",
     "fields": {
-      "nome completo": "João Silva",
+      "nome completo": "Ozzy Walsh",
       "data de nascimento": "01/01/1990",
       "nacionalidade": "Brasileira",
       "nome do pai": "Carlos Silva",
