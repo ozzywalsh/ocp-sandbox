@@ -13,7 +13,7 @@ crc config set enable-cluster-monitoring true
 
 echo "Starting CRC with:"
 echo "  CPUs: ${CRC_CPUS} cores"
-echo "  Memory: ${CRC_MEMORY}MB (20GB)"
+echo "  Memory: ${CRC_MEMORY}MB"
 echo "  Disk: ${CRC_DISK_SIZE}GB"
 echo ""
 
