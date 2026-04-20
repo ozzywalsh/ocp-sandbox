@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: taxform-renderer
-          image: image-registry.openshift-image-registry.svc:5000/sandbox/tax-form-renderer:latest
+          image: default-route-openshift-image-registry.apps-crc.testing/sandbox/tax-form-renderer:1776645686
           ports:
             - name: http
               containerPort: 8080

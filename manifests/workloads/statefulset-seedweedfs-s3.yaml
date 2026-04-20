@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: seaweedfs
+  namespace: seaweedfs-s3
+spec:
+  serviceName: "seaweedfs-s3"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seaweedfs
+  template:
+    metadata:
+      labels:
+        app: seaweedfs
+    spec:
+      containers:
+      - name: seaweedfs
+        image: chrislusf/seaweedfs:latest
+        args:
+        - "server"
+        - "-s3"
+        - "-filer"
+        - "-dir=/data"
+        ports:
+        - containerPort: 8333
+        - containerPort: 9333 # Master
+        - containerPort: 8888 # Filer
+        volumeMounts:
+        - name: sw-data
+          mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: sw-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 5Gi

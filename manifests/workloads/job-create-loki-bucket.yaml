@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-loki-bucket
+  namespace: seaweedfs-s3
+spec:
+  backoffLimit: 10
+  template:
+    spec:
+      containers:
+      - name: create-bucket
+        image: curlimages/curl:latest
+        command:
+        - sh
+        - -c
+        - |
+          until curl -sf http://seaweedfs-s3.seaweedfs-s3.svc:8333/; do
+            echo "waiting for seaweedfs..."
+            sleep 5
+          done
+          curl -X PUT http://seaweedfs-s3.seaweedfs-s3.svc:8333/loki-logs
+      restartPolicy: OnFailure

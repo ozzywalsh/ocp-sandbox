@@ -28,6 +28,14 @@ kubectl wait --for=condition=Available deployment/opentelemetry-operator-control
 kubectl apply -f manifests/workloads/
 ```
 
+## SeaweedFS + Loki
+
+SeaweedFS provides S3-compatible storage for Loki logs. The `create-loki-bucket` Job automatically creates the `loki-logs` bucket when workloads are applied. If you need to create it manually:
+
+```bash
+oc exec -n seaweedfs-s3 seaweedfs-0 -- curl -X PUT http://localhost:8333/loki-logs
+```
+
 ## MailPit
 
 MailPit runs in the `sandbox` namespace as a local SMTP server for Alertmanager notifications. Alertmanager is configured to send all alerts (except Watchdog) to MailPit.
