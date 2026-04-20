@@ -1,0 +1,7 @@
+# coo-operatorgroup.yaml
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: cluster-observability-operator-group
+  namespace: openshift-cluster-observability
+spec: {}
