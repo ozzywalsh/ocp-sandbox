@@ -11,12 +11,6 @@ spec:
         protocols:
           grpc: {}
           http: {}
-      jaeger:
-        protocols:
-          grpc: {}
-          thrift_binary: {}
-          thrift_compact: {}
-          thrift_http: {}
       zipkin: {}
     processors:
       batch: {}
