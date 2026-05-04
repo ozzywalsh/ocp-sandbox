@@ -2,17 +2,26 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
+	"strings"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/ozwalsh/otel-sndbox/todo-api/handler"
 )
+
+var httpRequestsTotal = promauto.NewCounterVec(prometheus.CounterOpts{
+	Name: "http_requests_total",
+	Help: "Total number of HTTP requests",
+}, []string{"method", "path", "status"})
 
 func main() {
 	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
@@ -74,6 +83,12 @@ func requestLogger(next http.Handler) http.Handler {
 		rec := &statusRecorder{ResponseWriter: w, status: http.StatusOK}
 
 		next.ServeHTTP(rec, r)
+
+		path := r.Pattern
+		if _, after, ok := strings.Cut(path, " "); ok {
+			path = after
+		}
+		httpRequestsTotal.WithLabelValues(r.Method, path, fmt.Sprintf("%d", rec.status)).Inc()
 
 		slog.Log(r.Context(), statusToLevel(rec.status), "request completed",
 			"method", r.Method,

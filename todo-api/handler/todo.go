@@ -13,11 +13,6 @@ import (
 )
 
 var (
-	requestsTotal = promauto.NewCounterVec(prometheus.CounterOpts{
-		Name: "todo_requests_total",
-		Help: "Total number of TODO API requests",
-	}, []string{"method", "status"})
-
 	todosGauge = promauto.NewGauge(prometheus.GaugeOpts{
 		Name: "todo_items_total",
 		Help: "Current number of TODO items",
@@ -59,7 +54,6 @@ func (h *Handler) List(w http.ResponseWriter, r *http.Request) {
 	h.mu.RUnlock()
 
 	slog.InfoContext(r.Context(), "listing todos", "count", len(items))
-	requestsTotal.WithLabelValues("list", "200").Inc()
 	writeJSON(w, http.StatusOK, items)
 }
 
@@ -72,13 +66,11 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		slog.WarnContext(r.Context(), "invalid request body", "error", err)
-		requestsTotal.WithLabelValues("create", "400").Inc()
 		http.Error(w, "invalid request body", http.StatusBadRequest)
 		return
 	}
 	if input.Title == "" {
 		slog.WarnContext(r.Context(), "missing title in create request")
-		requestsTotal.WithLabelValues("create", "400").Inc()
 		http.Error(w, "title is required", http.StatusBadRequest)
 		return
 	}
@@ -97,7 +89,6 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 
 	todosGauge.Inc()
 	slog.InfoContext(r.Context(), "created todo", "id", id, "title", input.Title)
-	requestsTotal.WithLabelValues("create", "201").Inc()
 	writeJSON(w, http.StatusCreated, todo)
 }
 
@@ -112,12 +103,10 @@ func (h *Handler) Get(w http.ResponseWriter, r *http.Request) {
 
 	if !ok {
 		slog.WarnContext(r.Context(), "todo not found", "id", id)
-		requestsTotal.WithLabelValues("get", "404").Inc()
 		http.Error(w, "not found", http.StatusNotFound)
 		return
 	}
 
-	requestsTotal.WithLabelValues("get", "200").Inc()
 	writeJSON(w, http.StatusOK, todo)
 }
 
@@ -132,7 +121,6 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		slog.WarnContext(r.Context(), "invalid request body", "error", err)
-		requestsTotal.WithLabelValues("update", "400").Inc()
 		http.Error(w, "invalid request body", http.StatusBadRequest)
 		return
 	}
@@ -142,7 +130,6 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		h.mu.Unlock()
 		slog.WarnContext(r.Context(), "todo not found for update", "id", id)
-		requestsTotal.WithLabelValues("update", "404").Inc()
 		http.Error(w, "not found", http.StatusNotFound)
 		return
 	}
@@ -156,7 +143,6 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 	h.mu.Unlock()
 
 	slog.InfoContext(r.Context(), "updated todo", "id", id)
-	requestsTotal.WithLabelValues("update", "200").Inc()
 	writeJSON(w, http.StatusOK, todo)
 }
 
@@ -170,7 +156,6 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		h.mu.Unlock()
 		slog.WarnContext(r.Context(), "todo not found for delete", "id", id)
-		requestsTotal.WithLabelValues("delete", "404").Inc()
 		http.Error(w, "not found", http.StatusNotFound)
 		return
 	}
@@ -179,7 +164,6 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {
 
 	todosGauge.Dec()
 	slog.InfoContext(r.Context(), "deleted todo", "id", id)
-	requestsTotal.WithLabelValues("delete", "204").Inc()
 	w.WriteHeader(http.StatusNoContent)
 }
 
