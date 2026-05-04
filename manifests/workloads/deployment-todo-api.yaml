@@ -35,20 +35,6 @@ spec:
       port: 8080
       targetPort: 8080
 ---
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  name: todo-api
-  namespace: sandbox
-spec:
-  selector:
-    matchLabels:
-      app: todo-api
-  endpoints:
-    - port: http
-      path: /metrics
-      interval: 30s
----
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
