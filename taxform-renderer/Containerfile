@@ -9,6 +9,8 @@ RUN CGO_ENABLED=0 go build -o /opt/app-root/taxform-renderer .
 FROM registry.access.redhat.com/ubi9/ubi-micro
 
 COPY --from=builder /opt/app-root/taxform-renderer /taxform-renderer
+COPY --from=builder /opt/app-root/src/templates /templates
 
+ENV HOME=/tmp
 EXPOSE 8080
 ENTRYPOINT ["/taxform-renderer"]

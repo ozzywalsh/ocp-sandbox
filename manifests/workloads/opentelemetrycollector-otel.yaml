@@ -24,7 +24,7 @@ spec:
     service:
       pipelines:
         traces:
-          receivers: [otlp, jaeger, zipkin]
+          receivers: [otlp, zipkin]
           processors: [memory_limiter, batch]
           exporters: [debug]
         metrics:

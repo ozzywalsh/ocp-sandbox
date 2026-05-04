@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -36,6 +37,7 @@ func Render() http.Handler {
 
 		var req RenderRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			slog.WarnContext(ctx, "invalid request body", "error", err)
 			span.SetStatus(codes.Error, "invalid request body")
 			renderCount.Add(ctx, 1,
 				metric.WithAttributes(attribute.String("status", "error"), attribute.String("template", "")),
@@ -57,6 +59,7 @@ func Render() http.Handler {
 
 		pdf, err := fillPDF(ctx, templatePath, req)
 		if err != nil {
+			slog.ErrorContext(ctx, "failed to render pdf", "error", err, "template", req.Template)
 			span.SetStatus(codes.Error, err.Error())
 			renderCount.Add(ctx, 1,
 				metric.WithAttributes(attribute.String("status", "error"), attribute.String("template", req.Template)),

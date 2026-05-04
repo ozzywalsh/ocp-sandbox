@@ -9,10 +9,9 @@ import (
 	"syscall"
 	"time"
 
-	"go.opentelemetry.io/otel/trace"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	"github.com/ozwalsh/otel-sndbox/taxform-renderer/handler"
-	"github.com/ozwalsh/otel-sndbox/taxform-renderer/telemetry"
+	"github.com/ozwalsh/otel-sndbox/todo-api/handler"
 )
 
 func main() {
@@ -21,15 +20,15 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	shutdown, err := telemetry.Setup(ctx)
-	if err != nil {
-		slog.Error("failed to setup telemetry", "error", err)
-		os.Exit(1)
-	}
-	defer shutdown(context.Background())
+	h := handler.New()
 
 	mux := http.NewServeMux()
-	mux.Handle("POST /render", handler.Render())
+	mux.HandleFunc("GET /todos", h.List)
+	mux.HandleFunc("POST /todos", h.Create)
+	mux.HandleFunc("GET /todos/{id}", h.Get)
+	mux.HandleFunc("PUT /todos/{id}", h.Update)
+	mux.HandleFunc("DELETE /todos/{id}", h.Delete)
+	mux.Handle("GET /metrics", promhttp.Handler())
 	mux.HandleFunc("GET /healthz", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	})
@@ -76,23 +75,22 @@ func requestLogger(next http.Handler) http.Handler {
 
 		next.ServeHTTP(rec, r)
 
-		duration := time.Since(start)
-		attrs := []any{
+		slog.Log(r.Context(), statusToLevel(rec.status), "request completed",
 			"method", r.Method,
 			"path", r.URL.Path,
 			"status", rec.status,
-			"duration_ms", duration.Milliseconds(),
-		}
-		if sc := trace.SpanFromContext(r.Context()).SpanContext(); sc.HasTraceID() {
-			attrs = append(attrs, "trace_id", sc.TraceID().String())
-		}
-
-		if rec.status >= 500 {
-			slog.Error("request completed", attrs...)
-		} else if rec.status >= 400 {
-			slog.Warn("request completed", attrs...)
-		} else {
-			slog.Info("request completed", attrs...)
-		}
+			"duration_ms", time.Since(start).Milliseconds(),
+		)
 	})
+}
+
+func statusToLevel(status int) slog.Level {
+	switch {
+	case status >= 500:
+		return slog.LevelError
+	case status >= 400:
+		return slog.LevelWarn
+	default:
+		return slog.LevelInfo
+	}
 }

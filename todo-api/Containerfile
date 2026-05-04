@@ -1,0 +1,15 @@
+FROM registry.access.redhat.com/ubi9/go-toolset:9.7 AS builder
+
+WORKDIR /opt/app-root/src
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 go build -o /opt/app-root/todo-api .
+
+FROM registry.access.redhat.com/ubi9/ubi-micro
+
+COPY --from=builder /opt/app-root/todo-api /todo-api
+
+ENV HOME=/tmp
+EXPOSE 8080
+ENTRYPOINT ["/todo-api"]

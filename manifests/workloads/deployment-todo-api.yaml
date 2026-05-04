@@ -1,49 +1,62 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: taxform-renderer
+  name: todo-api
   namespace: sandbox
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: taxform-renderer
+      app: todo-api
   template:
     metadata:
       labels:
-        app: taxform-renderer
+        app: todo-api
     spec:
       containers:
-        - name: taxform-renderer
-          image: image-registry.openshift-image-registry.svc:5000/sandbox/tax-form-renderer:latest
+        - name: todo-api
+          image: image-registry.openshift-image-registry.svc:5000/sandbox/todo-api:latest
           ports:
             - name: http
               containerPort: 8080
-          env:
-            - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: otel-collector.sandbox.svc:4317
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: taxform-renderer
+  name: todo-api
   namespace: sandbox
+  labels:
+    app: todo-api
 spec:
   selector:
-    app: taxform-renderer
+    app: todo-api
   ports:
     - name: http
       port: 8080
       targetPort: 8080
 ---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: todo-api
+  namespace: sandbox
+spec:
+  selector:
+    matchLabels:
+      app: todo-api
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
+---
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: taxform-renderer
+  name: todo-api
   namespace: sandbox
 spec:
   to:
     kind: Service
-    name: taxform-renderer
+    name: todo-api
   port:
     targetPort: http
