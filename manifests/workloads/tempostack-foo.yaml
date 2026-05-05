@@ -1,0 +1,30 @@
+apiVersion: tempo.grafana.com/v1alpha1
+kind: TempoMonolithic
+metadata:
+  name: tracing-system-tempo-stack
+  namespace: tracing-system
+spec:
+  storage:
+    traces:
+      backend: s3
+      size: 2Gi
+      s3:
+        secret: seaweedfs-tempo-creds
+  multitenancy:
+    enabled: true
+    mode: openshift
+  jaegerui:
+    enabled: true
+    route:
+      enabled: true
+  storageErrorPropagation: true
+  template:
+    gateway:
+      enabled: true
+    ingester:
+      config:
+        s3:
+          endpoint: http://seaweedfs-s3.seaweedfs-s3.svc:8333
+          region: eu-central-1
+          bucket: tempo-traces
+          insecure: true

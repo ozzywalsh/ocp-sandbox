@@ -40,6 +40,12 @@ spec:
     exporters:
       debug:
         verbosity: detailed
+      otlp/tempo:
+        endpoint: tempo-tracing-system-tempo-stack.tracing-system.svc:4317
+        tls:
+          insecure: true
+        headers:
+          X-Scope-OrgID: dev
       prometheus:
         endpoint: "0.0.0.0:8889"
     service:
@@ -47,7 +53,7 @@ spec:
         traces:
           receivers: [otlp, zipkin]
           processors: [memory_limiter, batch]
-          exporters: [debug]
+          exporters: [otlp/tempo, debug]
         metrics:
           receivers: [prometheus, otlp]
           processors: [k8sattributes, attributes, memory_limiter, batch]
