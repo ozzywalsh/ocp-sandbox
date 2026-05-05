@@ -37,18 +37,24 @@ spec:
           - key: "scraped_by"
             value: "otel-collector-ozwalsh"
             action: insert
+    extensions:
+      bearertokenauth:
+        filename: /var/run/secrets/kubernetes.io/serviceaccount/token
     exporters:
       debug:
         verbosity: detailed
       otlp/tempo:
-        endpoint: tempo-tracing-system-tempo-stack.tracing-system.svc:4317
+        endpoint: tempo-tracing-system-tempo-stack-gateway.tracing-system.svc:4317
         tls:
-          insecure: true
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
         headers:
           X-Scope-OrgID: dev
+        auth:
+          authenticator: bearertokenauth
       prometheus:
         endpoint: "0.0.0.0:8889"
     service:
+      extensions: [bearertokenauth]
       pipelines:
         traces:
           receivers: [otlp, zipkin]

@@ -13,6 +13,9 @@ spec:
   multitenancy:
     enabled: true
     mode: openshift
+    authentication:
+      - tenantName: dev
+        tenantId: dev
   jaegerui:
     enabled: true
     route:
