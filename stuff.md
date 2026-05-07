@@ -69,13 +69,18 @@ It outputs structured logs to stdout using `log/slog`.
 
 File: [`todo-api/main.go`](./todo-api/main.go)
 
-ServiceMonitor: [`manifests/workloads/servicemonitor-otel-collector.yaml`](./manifests/workloads/servicemonitor-otel-collector.yaml)
+Initially, a `ServiceMonitor` was added directly to the todo-api deployment manifest to have OpenShift's user-workload Prometheus scrape the `/metrics` endpoint. This was later removed when the OTel collector took over scraping — see the [removal commit](https://github.com/ozzywalsh/ocp-sandbox/commit/d8c6973#diff-3bf7405035cac2068f29b25826891ce511d2ea6f3e56cebdbbaebb45f18e3099).
 
 * Ensure you can access logs and custom metrics in the OpenShift console for your application. For logs, ensure you are using the Loki based logging console page.
 
 First install the cluster observability-operator by adding the relevant OLM resources; subscription, operatorgroup etc.
 
 File: [`./manifests/operator/subscription-cluster-observability.yaml`](./manifests/operator/subscription-cluster-observability.yaml)
+
+Create a LokiStack.
+File: [`./manifests/workloads/lokistack-logging.yaml`]
+
+Add a `ClusterLogForwarder` CR to get your application logs into the logging stack.
 
 Install the logging UI plugin by applying the following resource to your cluster [`manifests/workloads/uiplugin-logging.yaml`](./manifests/workloads/uiplugin-logging.yaml)
 
