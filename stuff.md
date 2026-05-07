@@ -1,4 +1,8 @@
 # Explore OpenShift
+* OpenShift Version: v4.21.8
+* Storage Backend: seaweedfs (S3 compatible)
+* Red Hat build of OpenTelemetry version: 3.9
+* MailPit to capture alertmanager email alerts.
 
 * Install OpenShift local on your company provided laptop
 
@@ -61,6 +65,8 @@ logging-loki-query-frontend-ff69bc95f-rpqdw   1/1     Running   2              2
 * Create a simple web application that will expose custom metrics in the Prometheus format and output logs.
 todo-api is a simple app instrumented using the prometheus golang instrumentation library. It exposes a `/metrics` endpoint.
 
+It outputs structured logs to stdout using `log/slog`.
+
 File: [`todo-api/main.go`](./todo-api/main.go)
 
 ServiceMonitor: [`manifests/workloads/servicemonitor-otel-collector.yaml`](./manifests/workloads/servicemonitor-otel-collector.yaml)
@@ -73,11 +79,17 @@ File: [`./manifests/operator/subscription-cluster-observability.yaml`](./manifes
 
 Install the logging UI plugin by applying the following resource to your cluster [`manifests/workloads/uiplugin-logging.yaml`](./manifests/workloads/uiplugin-logging.yaml)
 
+
 To get the admin credentials for the web console run:
 ```bash
 crc console --credentials
 ```
 Then use the kubeadmin user and the output password to login here: https://console-openshift-console.apps-crc.testing/
+
+Navigate to the Observe -> Logs and you should the the logging ui like below. 
+
+![Logging UI Screenshot](./docs-assets/logging-ui-screenshot.png)
+
 
 * Install OpenTelemetry
 
