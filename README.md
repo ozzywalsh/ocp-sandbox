@@ -1,5 +1,7 @@
 # OpenTelemetry Sandbox
 
+Exploring Openshift Doc: [./experience.md](./experience.md)
+
 OpenShift (CRC) cluster configuration for deploying the OpenTelemetry operator, a collector instance, and monitoring infrastructure.
 
 ## Structure
