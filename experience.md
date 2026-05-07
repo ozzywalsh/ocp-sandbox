@@ -4,8 +4,9 @@
 * Red Hat build of OpenTelemetry version: 3.9
 * MailPit to capture alertmanager email alerts.
 
+## Steps
 * Install OpenShift local on your company provided laptop
-
+  
 You can install CRC using the guide here: https://crc.dev/docs/installing/
 
 You can start CRC using optimal resources for the observability stack using the script in [`scripts/start-crc`](./scripts/start-crc).
