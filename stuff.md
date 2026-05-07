@@ -21,7 +21,8 @@ Cache Directory: /home/ozwalsh/.crc/cache
 
 OpenShift includes core platform monitoring out of the box. You also have the option to enable user workload monitoring to monitor your own projects[^1].
 
-To enable the user workload monitoring follow this guide: https://docs.redhat.com/en/documentation/openshift_container_platform/4.14/html/monitoring/configuring-user-workload-monitoring
+To enable the user workload monitoring follow this guide: [https://docs.redhat.com/en/documentation/monitoring_stack_for_red_hat_openshift/4.21/html-single/configuring_user_workload_monitoring/index#enabling-monitoring-for-user-defined-projects_preparing-to-configure-the-monitoring-stack-uwm](https://docs.redhat.com/en/documentation/monitoring_stack_for_red_hat_openshift/4.21/html-single/configuring_user_workload_monitoring/index#enabling-monitoring-for-user-defined-projects_preparing-to-configure-the-monitoring-stack-uwm)
+
 1. Add a `ConfigMap` to the `cluster-monitoring` namespace like here [`manifests/cluster/configmap-cluster-monitoring-config.yaml`](./manifests/cluster/configmap-cluster-monitoring-config.yaml)
 2. Wait a bit. You should see the following pods created in the `openshift-user-workload-monitoring` namespace.
 ```bash
