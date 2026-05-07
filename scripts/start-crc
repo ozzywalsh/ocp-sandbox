@@ -6,15 +6,13 @@
 
 # Resource allocation
 CRC_CPUS=8
-CRC_MEMORY=16384  # 16GB in MB
-CRC_DISK_SIZE=60  # GB
-
-crc config set enable-cluster-monitoring true
+CRC_MEMORY=24576  # 24GB in MB
+CRC_DISK_SIZE=250  # GB (sparse/thin-provisioned, only uses actual written data on host)
 
 echo "Starting CRC with:"
 echo "  CPUs: ${CRC_CPUS} cores"
-echo "  Memory: ${CRC_MEMORY}MB"
-echo "  Disk: ${CRC_DISK_SIZE}GB"
+echo "  Memory: ${CRC_MEMORY}MB (24GB)"
+echo "  Disk: ${CRC_DISK_SIZE}GB (sparse)"
 echo ""
 
 crc start \
