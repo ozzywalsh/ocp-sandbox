@@ -1,12 +1,11 @@
 # Explore OpenShift
 
-
 * Install OpenShift local on your company provided laptop
 
 You can install CRC using the guide here: https://crc.dev/docs/installing/
 You can start CRC using optimal resources for the observability stack using the script in  [`scripts/start-crc`](./)
 You can verify the installation by running `crc status`
-```
+```bash
 ozwalsh@ozwalsh-thinkpadt14gen4:~$ crc status
 CRC VM:          Running
 OpenShift:       Running (v4.21.8)
@@ -54,25 +53,37 @@ logging-loki-query-frontend-ff69bc95f-rpqdw   1/1     Running   2              2
 ```
 
 * Create a simple web application that will expose custom metrics in the Prometheus format and output logs.
+todo-api is a simple app instrumented using the prometheus golang instrumentation library. It exposes a `/metrics` endpoint.
 
-TODO add link to prometheus instrumented app
+TODO: Add link to ServiceMonitor.
+
+File: [`todo-api/main.go`](./) 
+
 
 * Ensure you can access logs and custom metrics in the OpenShift console for your application. For logs, ensure you are using the Loki based logging console page.
 
-First install the cluster observability-operator by adding the relevant subscription, operatorgroup etc. `./manifests/operator/subscription-cluster-observability.yaml`
-Install the logging UI plugin by applying the following resource to your cluster `./manifests/operator/uiplugin-logging.yaml`
+First install the cluster observability-operator by adding the relevant OLM resources; subscription, operatorgroup etc. 
+
+File: [`./manifests/operator/subscription-cluster-observability.yaml`](./)
+
+Install the logging UI plugin by applying the following resource to your cluster [`manifests/operator/uiplugin-logging.yaml`](./)
+
 To get the admin credentials for the web console run:
 ```
 crc console --credentials
 ```
 Then use the kubadmin user and the output password to login here: https://console-openshift-console.apps-crc.testing/
 
-TODO: Add screenshot
 * Install OpenTelemetry
 
-To install the opentelemetry-operator apply the opentelemetry subscription here `./manifests/operator/subscription-openshift-opentelemetry-product.yaml`
+To install the opentelemetry-operator add the relevant OLM resources; subcsription, operatorgroup etc.
+
+Docs: https://docs.redhat.com/en/documentation/red_hat_build_of_opentelemetry/3.9/html/installing_red_hat_build_of_opentelemetry/install-otel
+File: [`./manifests/operator/subscription-openshift-opentelemetry-product.yaml`]
+
+
 This should result in:
-```
+```bash
 ozwalsh@ozwalsh-thinkpadt14gen4:~/dev/otel-sndbox$ kubectl -n openshift-opentelemetry-operator get pods
 NAME                                                         READY   STATUS    RESTARTS      AGE
 opentelemetry-operator-controller-manager-86cbd7f9dc-hfpdk   1/1     Running   6 (21h ago)   2d
@@ -81,7 +92,9 @@ opentelemetry-operator-controller-manager-86cbd7f9dc-hfpdk   1/1     Running   6
 * Configure your OpenTelemetry collector so that it will read the metrics endpoint instead of the OpenShift Prometheus (the metrics endpoint should still be in the prometheus format, but scraped by the OTEL collector and not by the OpenShift Prometheus). Add an extra label to your metrics using the Collector and make sure that Collector is adding the right metadata for an application running in OpenShift/Kubernetes (you may need a processor to help with this). Ensure that you can see your metrics (with extra labels) in the OpenShift console.
 
 To fulfill this step we must first create a `OpenTelemetryCollector` CR configured with the `prometheus` receiver. 
-We must also add a processor add the appropriate labels to the metrics. See file `./manifests/workloads/opentelemetrycollector-otel`. (TODO: link old commit with prometheus receiver)
+We must also add a processor to add the appropriate labels to the metrics. 
+
+File: [`./manifests/workloads/opentelemetrycollector-otel`](./).
 
 * Update your application so that it uses OTLP metrics and logs. This will require updating your application to use the OpenTelemetry instrumentation libraries instead of the Prometheus one. Both the logs and metrics should be going through the OpenTelemetry collector. Ensure that you can see these metrics and logs in the OpenShift Console.
 
