@@ -1,6 +1,8 @@
 # Explore OpenShift
 
+
 * Install OpenShift local on your company provided laptop
+
 You can install CRC using the guide here: https://crc.dev/docs/installing/
 You can start CRC using optimal resources for the observability stack using the script in  [`scripts/start-crc`](./)
 You can verify the installation by running `crc status`
@@ -28,6 +30,7 @@ prometheus-operator-76dbbd9569-f9rgh   2/2     Running   6          2d23h
 prometheus-user-workload-0             6/6     Running   18         2d23h
 thanos-ruler-user-workload-0           4/4     Running   12         2d23h
 ```
+
 TODO: Add link to logging docs
 To do the installation on your CRC cluster we first need to apply the subscription to install the loki-operator. TODO: Link subscription
 Next we need to prepare an s3 compatible backend for loki. This repo utilizes seaweedfs for this purpose.
@@ -51,9 +54,11 @@ logging-loki-query-frontend-ff69bc95f-rpqdw   1/1     Running   2              2
 ```
 
 * Create a simple web application that will expose custom metrics in the Prometheus format and output logs.
+
 TODO add link to prometheus instrumented app
 
 * Ensure you can access logs and custom metrics in the OpenShift console for your application. For logs, ensure you are using the Loki based logging console page.
+
 First install the cluster observability-operator by adding the relevant subscription, operatorgroup etc. `./manifests/operator/subscription-cluster-observability.yaml`
 Install the logging UI plugin by applying the following resource to your cluster `./manifests/operator/uiplugin-logging.yaml`
 To get the admin credentials for the web console run:
@@ -64,6 +69,7 @@ Then use the kubadmin user and the output password to login here: https://consol
 
 TODO: Add screenshot
 * Install OpenTelemetry
+
 To install the opentelemetry-operator apply the opentelemetry subscription here `./manifests/operator/subscription-openshift-opentelemetry-product.yaml`
 This should result in:
 ```
@@ -73,6 +79,7 @@ opentelemetry-operator-controller-manager-86cbd7f9dc-hfpdk   1/1     Running   6
 ```
 
 * Configure your OpenTelemetry collector so that it will read the metrics endpoint instead of the OpenShift Prometheus (the metrics endpoint should still be in the prometheus format, but scraped by the OTEL collector and not by the OpenShift Prometheus). Add an extra label to your metrics using the Collector and make sure that Collector is adding the right metadata for an application running in OpenShift/Kubernetes (you may need a processor to help with this). Ensure that you can see your metrics (with extra labels) in the OpenShift console.
+
 To fulfill this step we must first create a `OpenTelemetryCollector` CR configured with the `prometheus` receiver. 
 We must also add a processor add the appropriate labels to the metrics. See file `./manifests/workloads/opentelemetrycollector-otel`. (TODO: link old commit with prometheus receiver)
 
@@ -86,6 +93,7 @@ Remove the instrumentation libraries for your application. This time use the Ope
 
 
 * Checkout the OpenTelemetry Operator and Collector code bases. Ensure that you can build these components locally on your machine.
+
 Clone this repo (otel repo). Follow the contributing.md. Link pull requests
 
 Deploy these locally built products into your OpenShift Local cluster.
