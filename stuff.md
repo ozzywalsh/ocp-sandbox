@@ -15,10 +15,19 @@ Cache Directory: /home/ozwalsh/.crc/cache
 ```
 
 * Ensure that OpenShift local has monitoring enabled (in-cluster and user workload monitoring) and that it is configured to use logging (Vector & Loki)
-OpenShift includes core platform monitoring out of the box[^1].
+
+OpenShift includes core platform monitoring out of the box. You also have the option option to enable user workload monitoring to monitor your own projects.[^1].
 
 To enable the user workload monitoring follow this guide: https://docs.r>edhat.com/en/documentation/openshift_container_platform/4.14/html/monitoring/configuring-user-workload-monitoring
-For an example check `./manifests/cluster/configmap-cluster-monitoring-config.yaml`
+1. Add a `ConfigMap` to the `cluster-monitoring` namespace like here [`manifests/configmap-cluster-monitoring-config.yaml`](./)
+2. Wait a bit. You should see the following pods created in the `openshift-user-workload-monitoring` namespace.
+```bash
+ozwalsh@ozwalsh-thinkpadt14gen4:~/dev/otel-sndbox$ oc -n openshift-user-workload-monitoring get pods
+NAME                                   READY   STATUS    RESTARTS   AGE
+prometheus-operator-76dbbd9569-f9rgh   2/2     Running   6          2d23h
+prometheus-user-workload-0             6/6     Running   18         2d23h
+thanos-ruler-user-workload-0           4/4     Running   12         2d23h
+```
 TODO: Add link to logging docs
 To do the installation on your CRC cluster we first need to apply the subscription to install the loki-operator. TODO: Link subscription
 Next we need to prepare an s3 compatible backend for loki. This repo utilizes seaweedfs for this purpose.
