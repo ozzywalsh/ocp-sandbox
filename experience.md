@@ -64,7 +64,8 @@ logging-loki-query-frontend-ff69bc95f-rpqdw   1/1     Running   2              2
 ```
 
 * Create a simple web application that will expose custom metrics in the Prometheus format and output logs.
-todo-api is a simple app instrumented using the prometheus golang instrumentation library. It exposes a `/metrics` endpoint.
+
+`todo-api` is a simple app instrumented using the prometheus golang instrumentation library. It exposes a `/metrics` endpoint.
 
 It outputs structured logs to stdout using `log/slog`.
 
