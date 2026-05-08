@@ -6,14 +6,14 @@
 
 ## Steps
 * Install OpenShift local on your company provided laptop
-  
-You can install CRC using the guide here: https://crc.dev/docs/installing/
+
+Docs: https://crc.dev/docs/installing/
 
 You can start CRC using optimal resources for the observability stack using the script in [`scripts/start-crc`](./scripts/start-crc).
 
 You can verify the installation by running `crc status`:
 ```bash
-ozwalsh@ozwalsh-thinkpadt14gen4:~$ crc status
+$ crc status
 CRC VM:          Running
 OpenShift:       Running (v4.21.8)
 RAM Usage:       19.07GB of 25.19GB
@@ -31,7 +31,7 @@ To enable the user workload monitoring follow this guide: [https://docs.redhat.c
 1. Add a `ConfigMap` to the `cluster-monitoring` namespace like here [`manifests/cluster/configmap-cluster-monitoring-config.yaml`](./manifests/cluster/configmap-cluster-monitoring-config.yaml)
 2. Wait a bit. You should see the following pods created in the `openshift-user-workload-monitoring` namespace.
 ```bash
-ozwalsh@ozwalsh-thinkpadt14gen4:~/dev/otel-sndbox$ oc -n openshift-user-workload-monitoring get pods
+$ oc -n openshift-user-workload-monitoring get pods
 NAME                                   READY   STATUS    RESTARTS   AGE
 prometheus-operator-76dbbd9569-f9rgh   2/2     Running   6          2d23h
 prometheus-user-workload-0             6/6     Running   18         2d23h
@@ -49,7 +49,7 @@ Next we need to prepare an s3 compatible backend for Loki. This repo utilizes Se
 
 Your `openshift-logging` namespace should look like this:
 ```bash
-ozwalsh@ozwalsh-thinkpadt14gen4:~$ kubectl -n openshift-logging get pods
+$ kubectl -n openshift-logging get pods
 NAME                                          READY   STATUS    RESTARTS       AGE
 cluster-logging-operator-77bfb75c76-vghlt     1/1     Running   2              2d
 instance-xdxtg                                1/1     Running   2              2d
@@ -88,7 +88,7 @@ Install the logging UI plugin by applying the following resource to your cluster
 
 To get the admin credentials for the web console run:
 ```bash
-crc console --credentials
+$ crc console --credentials
 ```
 Then use the kubeadmin user and the output password to login here: https://console-openshift-console.apps-crc.testing/
 
@@ -106,7 +106,7 @@ File: [`./manifests/operator/subscription-opentelemetry-product.yaml`](./manifes
 
 This should result in:
 ```bash
-ozwalsh@ozwalsh-thinkpadt14gen4:~/dev/otel-sndbox$ kubectl -n openshift-opentelemetry-operator get pods
+$ kubectl -n openshift-opentelemetry-operator get pods
 NAME                                                         READY   STATUS    RESTARTS      AGE
 opentelemetry-operator-controller-manager-86cbd7f9dc-hfpdk   1/1     Running   6 (21h ago)   2d
 ```
