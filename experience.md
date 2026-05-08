@@ -4,8 +4,7 @@
 * Red Hat build of OpenTelemetry version: 3.9
 * MailPit to capture alertmanager email alerts.
 
-## Steps
-* Install OpenShift local on your company provided laptop
+## Install OpenShift local on your company provided laptop
 
 Docs: https://crc.dev/docs/installing/
 
@@ -22,7 +21,7 @@ Cache Usage:     94.2GB
 Cache Directory: /home/ozwalsh/.crc/cache
 ```
 
-* Ensure that OpenShift local has monitoring enabled (in-cluster and user workload monitoring) and that it is configured to use logging (Vector & Loki)
+## Ensure that OpenShift local has monitoring enabled (in-cluster and user workload monitoring) and that it is configured to use logging (Vector & Loki)
 
 OpenShift includes core platform monitoring out of the box. You also have the option to enable user workload monitoring to monitor your own projects[^1].
 
@@ -63,7 +62,7 @@ logging-loki-querier-76997b458b-j4c6d         1/1     Running   2              2
 logging-loki-query-frontend-ff69bc95f-rpqdw   1/1     Running   2              2d
 ```
 
-* Create a simple web application that will expose custom metrics in the Prometheus format and output logs.
+## Create a simple web application that will expose custom metrics in the Prometheus format and output logs.
 
 `todo-api` is a simple app instrumented using the prometheus golang instrumentation library. It exposes a `/metrics` endpoint.
 
@@ -98,7 +97,7 @@ Navigate to the Observe -> Logs and you should the the logging ui like below.
 ![Logging UI Screenshot](./docs-assets/logging-ui-screenshot.png)
 
 
-* Install OpenTelemetry
+## Install OpenTelemetry
 
 To install the opentelemetry-operator add the relevant OLM resources; subscription, operatorgroup etc.
 
