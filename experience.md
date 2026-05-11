@@ -4,6 +4,11 @@
 * Red Hat build of OpenTelemetry version: 3.9
 * MailPit to capture alertmanager email alerts.
 
+### Applications
+* [`todo-api`](./todo-api) — Go REST API instrumented with Prometheus client library + `slog` structured logging.
+* [`taxform-renderer`](./taxform-renderer) — Go service instrumented with the OTel SDK (OTLP metrics, logs, and traces via `otelhttp`).
+* [`traffic-generator`](./traffic-generator) — Python app that generates load against the other services. Auto-instrumented via the OTel Operator.
+
 ## Install OpenShift local on your company provided laptop
 
 Docs: https://crc.dev/docs/installing/
@@ -120,6 +125,49 @@ To fulfill this step we must first create an `OpenTelemetryCollector` CR configu
 File: [`./manifests/workloads/opentelemetrycollector-otel.yaml`](./manifests/workloads/opentelemetrycollector-otel.yaml).
 
 ## Update your application so that it uses OTLP metrics and logs. This will require updating your application to use the OpenTelemetry instrumentation libraries instead of the Prometheus one. Both the logs and metrics should be going through the OpenTelemetry collector. Ensure that you can see these metrics and logs in the OpenShift Console.
+
+The `taxform-renderer` service is instrumented using the OTel Go SDK, replacing direct Prometheus and slog usage with OTLP exporters for metrics, logs, and traces.
+
+### Telemetry setup
+
+A `telemetry.Setup()` function initialises all three providers (traces, metrics, logs) and exports over gRPC to the collector:
+
+File: [`taxform-renderer/telemetry/telemetry.go`](./taxform-renderer/telemetry/telemetry.go)
+
+Key elements:
+- `otlptracegrpc` — exports traces via OTLP/gRPC.
+- `otlpmetricgrpc` — exports metrics via OTLP/gRPC (periodic reader).
+- `otlploggrpc` — exports logs via OTLP/gRPC (batch processor).
+- A `resource.Resource` sets the `service.name` semantic convention attribute.
+- `propagation.TraceContext{}` is set as the global propagator for W3C trace context propagation.
+
+### Logs
+
+The application replaces `slog.SetDefault(slog.New(slog.NewJSONHandler(...)))` with the OTel slog bridge:
+```go
+slog.SetDefault(otelslog.NewLogger("taxform-renderer"))
+```
+This routes all `slog` calls through the OTel `LoggerProvider`, so logs are exported to the collector over OTLP and can be correlated with traces.
+
+File: [`taxform-renderer/main.go`](./taxform-renderer/main.go)
+
+### HTTP instrumentation
+
+Incoming requests are wrapped with `otelhttp.NewHandler(...)`, which automatically creates spans and records HTTP metrics for each request.
+
+### Deployment
+
+The deployment sets `OTEL_EXPORTER_OTLP_ENDPOINT` to point at the in-cluster collector:
+
+File: [`manifests/workloads/deployment-taxform-renderer.yaml`](./manifests/workloads/deployment-taxform-renderer.yaml)
+
+### Collector configuration
+
+The collector already has an `otlp` receiver (gRPC + HTTP) and routes the incoming signals through the appropriate pipelines:
+- **logs** pipeline: `otlp` receiver → `k8sattributes` / `memory_limiter` / `batch` processors → `otlphttp/loki` exporter (Loki).
+- **metrics** pipeline: `otlp` + `prometheus` receivers → processors → `prometheus` exporter (scraped by user-workload Prometheus).
+
+File: [`manifests/workloads/opentelemetrycollector-otel.yaml`](./manifests/workloads/opentelemetrycollector-otel.yaml)
 
 ## Install Distributed Tracing in the OpenShift console and update your simple application so that a request goes through multiple different services.
 
