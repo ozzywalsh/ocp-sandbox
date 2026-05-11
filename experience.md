@@ -128,6 +128,9 @@ File: [`./manifests/workloads/opentelemetrycollector-otel.yaml`](./manifests/wor
 
 ## Remove the instrumentation libraries for your application. This time use the OpenTelemetry Operator to inject auto-instrumentation into your application. Ensure you can access the logs, metrics and traces in the OpenShift Console.
 
+See traffic-generator for an example of an auto instrumented python application. [`traffic-generator`](./traffic-generator/`)
+
+
 ## Checkout the OpenTelemetry Operator and Collector code bases. Ensure that you can build these components locally on your machine.
 
 My pull requests made on the upstream otel-operator: [pull requests link](https://github.com/open-telemetry/opentelemetry-operator/pulls?q=is%3Apr+author%3Aozzywalsh+is%3Aclosed)
