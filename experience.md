@@ -130,10 +130,13 @@ File: [`./manifests/workloads/opentelemetrycollector-otel.yaml`](./manifests/wor
 
 See traffic-generator for an example of an auto instrumented python application. [`./traffic-generator`](./traffic-generator)
 
+See the relevant Instruemenetation CR [`./manifests/workloads/instrumentation.yaml`](./manifests/workloads/instrumentation.yaml)
+
 
 ## Checkout the OpenTelemetry Operator and Collector code bases. Ensure that you can build these components locally on your machine.
 
 My pull requests made on the upstream otel-operator: [pull requests link](https://github.com/open-telemetry/opentelemetry-operator/pulls?q=is%3Apr+author%3Aozzywalsh+is%3Aclosed)
 
+The otel-collector has also been cloned and built.
 
 [^1]: https://docs.redhat.com/en/documentation/monitoring_stack_for_red_hat_openshift/4.21/html/about_monitoring/about-ocp-monitoring
