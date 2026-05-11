@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traffic-generator
+  namespace: sandbox
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: traffic-generator
+  template:
+    metadata:
+      labels:
+        app: traffic-generator
+      annotations:
+        instrumentation.opentelemetry.io/inject-python: "true"
+    spec:
+      containers:
+        - name: traffic-generator
+          image: image-registry.openshift-image-registry.svc:5000/sandbox/traffic-generator:latest
+          env:
+            - name: TARGET_URL
+              value: http://taxform-renderer.sandbox.svc:8080/render
+            - name: INTERVAL_SECONDS
+              value: "10"
+            - name: ERROR_RATE
+              value: "0.2"

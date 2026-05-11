@@ -1,0 +1,19 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: otel-instrumentation
+  namespace: sandbox
+spec:
+  exporter:
+    endpoint: http://otel-collector.sandbox.svc:4318
+  propagators:
+    - tracecontext
+    - baggage
+  sampler:
+    type: always_on
+  python:
+    env:
+      - name: OTEL_EXPORTER_OTLP_PROTOCOL
+        value: http/protobuf
+      - name: OTEL_LOGS_EXPORTER
+        value: otlp

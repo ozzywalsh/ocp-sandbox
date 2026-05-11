@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"go.opentelemetry.io/contrib/bridges/otelslog"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/ozwalsh/otel-sndbox/taxform-renderer/handler"
@@ -42,7 +43,7 @@ func main() {
 
 	srv := &http.Server{
 		Addr:    ":" + port,
-		Handler: requestLogger(mux),
+		Handler: otelhttp.NewHandler(requestLogger(mux), "taxform-renderer"),
 	}
 
 	go func() {
