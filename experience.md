@@ -86,12 +86,11 @@ First install the cluster observability-operator by adding the relevant OLM reso
 File: [`./manifests/operator/subscription-cluster-observability.yaml`](./manifests/operator/subscription-cluster-observability.yaml)
 
 Create a LokiStack.
-File: [`./manifests/workloads/lokistack-logging.yaml`]
+File: [`./manifests/workloads/lokistack-logging-loki.yaml`](./manifests/workloads/lokistack-logging-loki.yaml)
 
-Add a `ClusterLogForwarder` CR to get your application logs into the logging stack.
+Initially a `ClusterLogForwarder` CR was used to get application logs into Loki. This was later replaced by the OTel collector's OTLP log pipeline, which exports logs to Loki via the `otlphttp/loki` exporter (see the [collector config](./manifests/workloads/opentelemetrycollector-otel.yaml)).
 
 Install the logging UI plugin by applying the following resource to your cluster [`manifests/workloads/uiplugin-logging.yaml`](./manifests/workloads/uiplugin-logging.yaml)
-
 
 To get the admin credentials for the web console run:
 ```bash
@@ -99,7 +98,7 @@ $ crc console --credentials
 ```
 Then use the kubeadmin user and the output password to login here: https://console-openshift-console.apps-crc.testing/
 
-Navigate to the Observe -> Logs and you should the the logging ui like below. 
+Navigate to the Observe -> Logs and you should see the logging UI like below.
 
 ![Logging UI Screenshot](./docs-assets/logging-ui-screenshot.png)
 
