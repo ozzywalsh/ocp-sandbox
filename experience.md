@@ -185,6 +185,29 @@ See the relevant Instruemenetation CR [`./manifests/workloads/instrumentation.ya
 
 My pull requests made on the upstream otel-operator: [pull requests link](https://github.com/open-telemetry/opentelemetry-operator/pulls?q=is%3Apr+author%3Aozzywalsh+is%3Aclosed)
 
-The otel-collector has also been cloned and built.
+The otel-collector has also been cloned, customized (log line added at startup) and built (note Hello! being logged):
+
+```bash
+ozwalsh@ozwalsh-thinkpadt14gen4:~/dev/opentelemetry-collector/cmd/otelcorecol$ git diff
+diff --git a/service/service.go b/service/service.go
+index 0780648a4..1d5ec2d32 100644
+--- a/service/service.go
++++ b/service/service.go
+@@ -242,6 +242,7 @@ func (srv *Service) Start(ctx context.Context) error {
+                zap.String("Version", srv.buildInfo.Version),
+                zap.Int("NumCPU", runtime.NumCPU()),
+        )
++       srv.telemetrySettings.Logger.Info("Hello!")
+ 
+        if err := srv.host.ServiceExtensions.Start(ctx, srv.host); err != nil {
+                return fmt.Errorf("failed to start extensions: %w", err)
+ozwalsh@ozwalsh-thinkpadt14gen4:~/dev/opentelemetry-collector/cmd/otelcorecol$ ./otelcorecol --config config.yaml
+2026-05-11T16:51:37.428+0200	info	otelconftelemetry/tracer.go:47	Internal trace telemetry disabled	{"resource": {"service.instance.id": "431e005e-a609-49f5-a540-0460c11eb34d", "service.name": "otelcorecol", "service.version": "0.152.0-dev"}}
+2026-05-11T16:51:37.439+0200	info	service/service.go:241	Starting otelcorecol...	{"resource": {"service.instance.id": "431e005e-a609-49f5-a540-0460c11eb34d", "service.name": "otelcorecol", "service.version": "0.152.0-dev"}, "Version": "0.152.0-dev", "NumCPU": 12}
+2026-05-11T16:51:37.440+0200	info	service/service.go:245	Hello!	{"resource": {"service.instance.id": "431e005e-a609-49f5-a540-0460c11eb34d", "service.name": "otelcorecol", "service.version": "0.152.0-dev"}}
+2026-05-11T16:51:37.440+0200	info	extensions/extensions.go:41	Starting extensions...	{"resource": {"service.instance.id": "431e005e-a609-49f5-a540-0460c11eb34d", "service.name": "otelcorecol", "service.version": "0.152.0-dev"}}
+2026-05-11T16:51:37.441+0200	info	otlpreceiver/otlp.go:120	Starting GRPC server	{"resource": {"service.instance.id": "431e005e-a609-49f5-a540-0460c11eb34d", "service.name": "otelcorecol", "service.version": "0.152.0-dev"}, "otelcol.component.id": "otlp", "otelcol.component.kind": "receiver", "endpoint": "127.0.0.1:4317"}
+2026-05-11T16:51:37.442+0200	info	service/service.go:265	Everything is ready. Begin running and processing data.	{"resource": {"service.instance.id": "431e005e-a609-49f5-a540-0460c11eb34d", "service.name": "otelcorecol", "service.version": "0.152.0-dev"}}
+```
 
 [^1]: https://docs.redhat.com/en/documentation/monitoring_stack_for_red_hat_openshift/4.21/html/about_monitoring/about-ocp-monitoring
