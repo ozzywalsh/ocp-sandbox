@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"go.opentelemetry.io/contrib/bridges/otelslog"
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/ozwalsh/otel-sndbox/taxform-renderer/handler"
@@ -16,8 +17,6 @@ import (
 )
 
 func main() {
-	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
-
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
@@ -26,6 +25,8 @@ func main() {
 		slog.Error("failed to setup telemetry", "error", err)
 		os.Exit(1)
 	}
+
+	slog.SetDefault(otelslog.NewLogger("taxform-renderer"))
 	defer shutdown(context.Background())
 
 	mux := http.NewServeMux()

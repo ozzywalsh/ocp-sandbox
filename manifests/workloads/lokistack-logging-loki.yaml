@@ -6,8 +6,13 @@ metadata:
 spec:
   managementState: Managed
   limits:
-    global: 
-      retention: 
+    global:
+      otlp:
+        streamLabels:
+          resourceAttributes:
+            - name: service.name
+            - name: k8s.namespace.name
+      retention:
         days: 1 # Set the value as per requirement
   size: 1x.demo 
   storage:

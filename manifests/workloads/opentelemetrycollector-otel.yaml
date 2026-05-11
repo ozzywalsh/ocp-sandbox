@@ -42,7 +42,13 @@ spec:
         filename: /var/run/secrets/kubernetes.io/serviceaccount/token
     exporters:
       debug:
-        verbosity: detailed
+        verbosity: basic
+      otlphttp/loki:
+        endpoint: https://logging-loki-gateway-http.openshift-logging.svc:8080/api/logs/v1/application/otlp
+        tls:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+        auth:
+          authenticator: bearertokenauth
       otlp/tempo:
         endpoint: tempo-tracing-system-tempo-stack-gateway.tracing-system.svc:4317
         tls:
@@ -56,11 +62,15 @@ spec:
     service:
       extensions: [bearertokenauth]
       pipelines:
-        traces:
-          receivers: [otlp, zipkin]
-          processors: [memory_limiter, batch]
-          exporters: [otlp/tempo, debug]
+        logs:
+          receivers: [otlp]
+          processors: [k8sattributes, memory_limiter, batch]
+          exporters: [otlphttp/loki, debug]
         metrics:
           receivers: [prometheus, otlp]
           processors: [k8sattributes, attributes, memory_limiter, batch]
           exporters: [prometheus, debug]
+        traces:
+          receivers: [otlp, zipkin]
+          processors: [memory_limiter, batch]
+          exporters: [otlp/tempo, debug]
