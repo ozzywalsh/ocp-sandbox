@@ -113,21 +113,22 @@ NAME                                                         READY   STATUS    R
 opentelemetry-operator-controller-manager-86cbd7f9dc-hfpdk   1/1     Running   6 (21h ago)   2d
 ```
 
-* Configure your OpenTelemetry collector so that it will read the metrics endpoint instead of the OpenShift Prometheus (the metrics endpoint should still be in the prometheus format, but scraped by the OTEL collector and not by the OpenShift Prometheus). Add an extra label to your metrics using the Collector and make sure that Collector is adding the right metadata for an application running in OpenShift/Kubernetes (you may need a processor to help with this). Ensure that you can see your metrics (with extra labels) in the OpenShift console.
+## Configure your OpenTelemetry collector so that it will read the metrics endpoint instead of the OpenShift Prometheus (the metrics endpoint should still be in the prometheus format, but scraped by the OTEL collector and not by the OpenShift Prometheus). Add an extra label to your metrics using the Collector and make sure that Collector is adding the right metadata for an application running in OpenShift/Kubernetes (you may need a processor to help with this). Ensure that you can see your metrics (with extra labels) in the OpenShift console.
 
 To fulfill this step we must first create an `OpenTelemetryCollector` CR configured with the `prometheus` receiver. We must also add a processor to add the appropriate labels to the metrics.
 
 File: [`./manifests/workloads/opentelemetrycollector-otel.yaml`](./manifests/workloads/opentelemetrycollector-otel.yaml).
 
-* Update your application so that it uses OTLP metrics and logs. This will require updating your application to use the OpenTelemetry instrumentation libraries instead of the Prometheus one. Both the logs and metrics should be going through the OpenTelemetry collector. Ensure that you can see these metrics and logs in the OpenShift Console.
+## Update your application so that it uses OTLP metrics and logs. This will require updating your application to use the OpenTelemetry instrumentation libraries instead of the Prometheus one. Both the logs and metrics should be going through the OpenTelemetry collector. Ensure that you can see these metrics and logs in the OpenShift Console.
 
-* Install Distributed Tracing in the OpenShift console and update your simple application so that a request goes through multiple different services.
+## Install Distributed Tracing in the OpenShift console and update your simple application so that a request goes through multiple different services.
 
-Instrument your application for tracing (autoinstrumentation is fine, but please do so at build time). Ensure that you can now access your OTEL metrics, logs and traces in the OpenShift console.
+![Tracing UI Screenshot](./docs-assets/tracing-ui-screenshot.png)
 
-Remove the instrumentation libraries for your application. This time use the OpenTelemetry Operator to inject auto-instrumentation into your application. Ensure you can access the logs, metrics and traces in the OpenShift Console.
 
-* Checkout the OpenTelemetry Operator and Collector code bases. Ensure that you can build these components locally on your machine.
+## Remove the instrumentation libraries for your application. This time use the OpenTelemetry Operator to inject auto-instrumentation into your application. Ensure you can access the logs, metrics and traces in the OpenShift Console.
+
+## Checkout the OpenTelemetry Operator and Collector code bases. Ensure that you can build these components locally on your machine.
 
 Clone this repo (otel repo). Follow the contributing.md. Link pull requests.
 
