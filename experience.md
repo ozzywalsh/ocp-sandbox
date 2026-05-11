@@ -130,8 +130,7 @@ File: [`./manifests/workloads/opentelemetrycollector-otel.yaml`](./manifests/wor
 
 ## Checkout the OpenTelemetry Operator and Collector code bases. Ensure that you can build these components locally on your machine.
 
-Clone this repo (otel repo). Follow the contributing.md. Link pull requests.
+My pull requests made on the upstream otel-operator: [pull requests link](https://github.com/open-telemetry/opentelemetry-operator/pulls?q=is%3Apr+author%3Aozzywalsh+is%3Aclosed)
 
-Deploy these locally built products into your OpenShift Local cluster. Make a small change to the Operator and Collector to ensure that you are deploying this new version.
 
 [^1]: https://docs.redhat.com/en/documentation/monitoring_stack_for_red_hat_openshift/4.21/html/about_monitoring/about-ocp-monitoring
